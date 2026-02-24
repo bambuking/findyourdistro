@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Linux Distro Finder – Quiz (50 Distros)</title>
+  <meta name="color-scheme" content="dark light" />
+  <style>
+    :root{
+      --bg0:#0b1020;
+      --bg1:#0f1730;
+      --card:#111a36cc;
+      --text:#eaf0ff;
+      --muted:#a9b4d6;
+      --muted2:#7f8bb4;
+      --accent:#7c5cff;
+      --accent2:#33d6ff;
+      --ring: 0 0 0 3px rgba(124,92,255,.28);
+      --shadow: 0 18px 60px rgba(0,0,0,.42);
+      --radius2: 24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(124,92,255,.35), transparent 60%),
+        radial-gradient(900px 700px at 85% 30%, rgba(51,214,255,.22), transparent 60%),
+        radial-gradient(1200px 900px at 50% 110%, rgba(49,208,138,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 44px}
+    header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:14px;align-items:center;min-width:260px}
+    .logo{
+      width:48px;height:48px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), transparent 45%),
+        linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 14px 40px rgba(124,92,255,.25);
+      position:relative;overflow:hidden;
+    }
+    .logo:after{
+      content:"";position:absolute;inset:-30%;
+      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 55%);
+      transform: rotate(18deg);
+      animation: floatGlow 6s ease-in-out infinite;
+    }
+    @keyframes floatGlow{
+      0%,100%{transform:translateY(0) rotate(18deg)}
+      50%{transform:translateY(10px) rotate(18deg)}
+    }
+    .title h1{margin:0;font-size:clamp(20px,2.2vw,28px);letter-spacing:.2px;line-height:1.1}
+    .title p{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.35;max-width:620px}
+    .topActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;
+      background: rgba(255,255,255,.06);border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);
+      color:var(--muted);font-size:13px;user-select:none;
+    }
+    .pill b{color:var(--text)}
+    .kbd{
+      font-family:var(--mono);font-size:12px;padding:3px 7px;border-radius:10px;
+      background: rgba(255,255,255,.08);border: 1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+    }
+    .grid{display:grid;grid-template-columns: 1.1fr .9fr;gap:16px;align-items:start;margin-top:14px}
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      header{flex-direction:column;align-items:stretch}
+      .topActions{justify-content:flex-start}
+    }
+    .card{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      overflow:hidden;position:relative;
+    }
+    .card .inner{padding:18px}
+    .card:before{
+      content:"";position:absolute;inset:-2px;
+      background:
+        radial-gradient(900px 300px at 20% 0%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(700px 250px at 100% 40%, rgba(51,214,255,.14), transparent 60%);
+      pointer-events:none;
+    }
+
+    .progressWrap{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .progressBar{
+      flex:1;height:10px;background: rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);border-radius:999px;overflow:hidden;
+    }
+    .progressFill{
+      height:100%;width:0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius:999px;
+      box-shadow: 0 0 22px rgba(124,92,255,.35);
+      transition: width .35s ease;
+    }
+    .progressText{min-width:190px;text-align:right;color:var(--muted);font-size:13px;user-select:none}
+
+    .qTitle{margin:6px 0 10px;font-size:clamp(18px,2vw,22px);letter-spacing:.2px;line-height:1.2;position:relative;z-index:1}
+    .qHint{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4;position:relative;z-index:1}
+
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+    @media (max-width:560px){.choices{grid-template-columns:1fr}}
+
+    .btn{
+      appearance:none;border:none;background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.11);
+      border-radius: 16px;padding: 12px 12px;cursor:pointer;color: var(--text);text-align:left;
+      transition: transform .08s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+      position:relative;overflow:hidden;min-height:56px;
+    }
+    .btn:hover{background: rgba(255,255,255,.085);border-color: rgba(255,255,255,.18);transform: translateY(-1px)}
+    .btn:focus-visible{outline:none; box-shadow: var(--shadow), var(--ring)}
+    .btn:active{transform: translateY(0px) scale(.99)}
+    .btn .t{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;line-height:1.2}
+    .btn .tag{
+      font-size:12px;color:var(--muted);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      padding:3px 8px;border-radius:999px;white-space:nowrap;
+    }
+    .btn .sub{margin-top:6px;color:var(--muted);font-size:12.5px;line-height:1.25}
+
+    .navRow{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:14px;position:relative;z-index:1}
+    .navRow .left,.navRow .right{display:flex;gap:10px;align-items:center}
+
+    .mini{
+      padding:10px 12px;border-radius:14px;background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      color:var(--muted);cursor:pointer;
+      transition: background .15s ease, border-color .15s ease, transform .08s ease;
+      user-select:none;font-size:13px;
+    }
+    .mini:hover{background: rgba(255,255,255,.075); border-color: rgba(255,255,255,.16)}
+    .mini:active{transform: scale(.99)}
+    .mini:focus-visible{outline:none; box-shadow: var(--ring)}
+    .mini.primary{
+      color:var(--text);
+      background: linear-gradient(90deg, rgba(124,92,255,.85), rgba(51,214,255,.72));
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .sidebar h2{margin:0 0 10px;font-size:16px;letter-spacing:.2px}
+    .sidebar p{margin:0 0 12px;color:var(--muted);font-size:13.5px;line-height:1.4}
+    .traitChips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+    .chip{
+      font-size:12px;padding:6px 10px;border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);user-select:none;
+    }
+    .chip strong{color:var(--text);font-weight:600}
+    .chip.good{border-color: rgba(49,208,138,.35); background: rgba(49,208,138,.10); color:#bdf4dd}
+    .chip.warn{border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.10); color:#ffe7b3}
+
+    .divider{height:1px;background: rgba(255,255,255,.10);margin:12px 0}
+    .resultList{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .resultCard{
+      padding:12px 12px;border-radius:16px;background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      transition: transform .10s ease, background .15s ease, border-color .15s ease;
+    }
+    .resultCard:hover{background: rgba(255,255,255,.07);border-color: rgba(255,255,255,.16);transform: translateY(-1px)}
+    .resultTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .resultName{font-weight:700;letter-spacing:.2px;margin:0;font-size:15px;line-height:1.2}
+    .resultDesc{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.35}
+    .scorePill{
+      display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
+      background: rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.35);
+      color:#d7d0ff;font-size:12.5px;white-space:nowrap;user-select:none;
+    }
+    .meter{margin-top:10px;height:8px;border-radius:999px;background: rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);overflow:hidden}
+    .meter > div{height:100%;width:0%;background: linear-gradient(90deg, var(--accent), var(--accent2));transition: width .45s ease}
+
+    .searchRow{display:flex;gap:10px;align-items:center;margin-top:10px}
+    input[type="search"]{
+      width:100%;padding:10px 12px;border-radius:14px;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);outline:none;
+      box-shadow: 0 10px 28px rgba(0,0,0,.16);
+    }
+    input[type="search"]:focus{box-shadow: 0 10px 28px rgba(0,0,0,.16), var(--ring)}
+    .muted{color:var(--muted)}
+    .note{font-size:12.5px;color:var(--muted2);line-height:1.35;margin-top:10px}
+
+    .fadeIn{animation: fadeIn .22s ease-out both}
+    @keyframes fadeIn{from{opacity:0;transform: translateY(6px)}to{opacity:1;transform: translateY(0)}}
+
+    .toast{
+      position:fixed;right:16px;bottom:16px;max-width:420px;
+      padding:12px 12px;border-radius:16px;
+      background: rgba(17,26,54,.88);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);
+      display:none;z-index:9999;
+    }
+    .toast.show{display:block; animation: fadeIn .18s ease-out both}
+    .toast .small{margin-top:4px;color:var(--muted);font-size:12.5px;line-height:1.3}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">
+          <h1>Linux Distro Finder – Quiz</h1>
+          <p>Mehr Fragen, bessere Treffer: Das Quiz erstellt ein Profil und empfiehlt passende Distributionen (insgesamt 50, inkl. Bazzite).</p>
+        </div>
+      </div>
+      <div class="topActions">
+        <div class="pill" title="Tastatur">
+          <span>Shortcuts:</span>
+          <span class="kbd">1–9</span><span class="muted">Antwort</span>
+          <span class="kbd">→</span><span class="muted">Weiter</span>
+          <span class="kbd">←</span><span class="muted">Zurück</span>
+        </div>
+        <button class="mini" id="btnResetTop" type="button">Neu starten</button>
+        <button class="mini primary" id="btnSkipToResults" type="button">Ergebnis ansehen</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main class="card" id="quizCard">
+        <div class="inner">
+          <div class="progressWrap">
+            <div class="progressBar" aria-label="Fortschritt">
+              <div class="progressFill" id="progressFill"></div>
+            </div>
+            <div class="progressText" id="progressText">0 / 0</div>
+          </div>
+
+          <div id="quizView">
+            <h2 class="qTitle" id="qTitle">…</h2>
+            <p class="qHint" id="qHint">…</p>
+            <div class="choices" id="choices"></div>
+
+            <div class="navRow">
+              <div class="left">
+                <button class="mini" id="btnBack" type="button">Zurück</button>
+                <button class="mini" id="btnRestart" type="button">Reset</button>
+              </div>
+              <div class="right">
+                <button class="mini primary" id="btnNext" type="button">Weiter</button>
+              </div>
+            </div>
+
+            <p class="note">Bewertung = Trait-Profil × Distro-Profil. Je mehr du beantwortest, desto stabiler die Top 5.</p>
+          </div>
+
+          <div id="resultsView" style="display:none">
+            <div class="fadeIn">
+              <h2 class="qTitle" style="margin-top:0">Deine Matches</h2>
+              <p class="qHint" id="resultSummary">…</p>
+
+              <div class="divider"></div>
+
+              <div class="searchRow">
+                <input id="search" type="search" placeholder="Filter: z.B. 'arch', 'privacy', 'server', 'lightweight', 'immutable'…" />
+                <button class="mini" id="btnCopyTop" type="button" title="Top 5 als Text kopieren">Top 5 kopieren</button>
+              </div>
+
+              <div class="resultList" id="resultList"></div>
+
+              <div class="divider"></div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap">
+                <button class="mini primary" id="btnRestart2" type="button">Quiz neu starten</button>
+                <button class="mini" id="btnBackToQuiz" type="button">Zurück zum Quiz</button>
+              </div>
+
+              <p class="note">Tipp: Wenn du unsicher bist, wähle zuerst das passende Release-Modell (stable vs rolling) und dann Fokus (Desktop/Gaming/Server/Security).</p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="card sidebar">
+        <div class="inner">
+          <h2>Dein Profil (live)</h2>
+          <p>Diese Chips zeigen die stärksten Signale aus deinen Antworten.</p>
+          <div class="traitChips" id="traitChips"></div>
+
+          <div class="divider"></div>
+
+          <h2 style="margin:0 0 8px; font-size:14px">Enthaltene Distros</h2>
+          <p style="margin:0" class="muted">Desktop, Server, Rolling, Stable, Security/Privacy, Lightweight, Immutable/Atomic – 50 Stück.</p>
+
+          <div class="divider"></div>
+          <p class="note">
+            Shortcuts: <span class="kbd">1–9</span> Antwort wählen,
+            <span class="kbd">→</span> Weiter,
+            <span class="kbd">←</span> Zurück.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div id="toastTitle">…</div>
+    <div class="small" id="toastBody">…</div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Traits ----------
+  const TRAITS = [
+    "beginner","advanced","gaming","privacy","security","server",
+    "desktop","lightweight","stable","rolling","enterprise",
+    "minimal","customizable","immutable"
+  ];
+
+  const traitLabel = {
+    beginner:"Anfängerfreundlich",
+    advanced:"Fortgeschritten/Basteln",
+    gaming:"Gaming",
+    privacy:"Privacy",
+    security:"Security",
+    server:"Server/DevOps",
+    desktop:"Desktop/Alltag",
+    lightweight:"Leichtgewichtig",
+    stable:"Stabil/LTS",
+    rolling:"Rolling/Neueste",
+    enterprise:"Enterprise",
+    minimal:"Minimalistisch",
+    customizable:"Tweakbar",
+    immutable:"Immutable/Atomic"
+  };
+
+  // ---------- Questions (viel mehr) ----------
+  // Hinweis: Du kannst jederzeit "Ergebnis ansehen" klicken – aber für bessere Matches: mehr beantworten.
+  const QUESTIONS = [
+    {
+      id:"experience",
+      title:"Wie viel Linux-Erfahrung hast du?",
+      hint:"Das entscheidet stark, ob „Out-of-the-box“ oder DIY sinnvoll ist.",
+      options:[
+        { label:"Einsteiger:in – soll einfach laufen", tag:"Easy", delta:{ beginner:+3, stable:+1, desktop:+1 } },
+        { label:"Basics okay – Komfort wichtig", tag:"Balanced", delta:{ beginner:+1, customizable:+1, desktop:+1 } },
+        { label:"Fortgeschritten – ich bastle gern", tag:"DIY", delta:{ advanced:+3, customizable:+2, rolling:+1, minimal:+1 } },
+        { label:"Profi – maximale Kontrolle", tag:"Power", delta:{ advanced:+4, minimal:+2, customizable:+3, rolling:+1 } }
+      ]
+    },
+    {
+      id:"usecase",
+      title:"Wofür nutzt du Linux hauptsächlich?",
+      hint:"Alltag, Gaming, Server oder Security – das verschiebt die Top-Empfehlungen massiv.",
+      options:[
+        { label:"Alltag/Office/Studium", tag:"Desktop", delta:{ desktop:+3, beginner:+1, stable:+1 } },
+        { label:"Softwareentwicklung / DevOps", tag:"Dev", delta:{ server:+2, desktop:+1, customizable:+1, rolling:+1 } },
+        { label:"Server (VPS/Home-Server/Dienste)", tag:"Server", delta:{ server:+4, stable:+2, enterprise:+1, minimal:+1 } },
+        { label:"Security / Pentesting / Forensik", tag:"Sec", delta:{ security:+4, privacy:+2, advanced:+2 } }
+      ]
+    },
+    {
+      id:"dailyDriver",
+      title:"Soll das dein Daily Driver sein?",
+      hint:"Spezial-Distros sind top – aber manchmal nicht als Alltags-OS gedacht.",
+      options:[
+        { label:"Ja, täglich (Surfen, Mail, Office)", tag:"Daily", delta:{ desktop:+3, stable:+1, beginner:+1 } },
+        { label:"Gemischt: Desktop + Basteln", tag:"Hybrid", delta:{ desktop:+2, customizable:+2, advanced:+1 } },
+        { label:"Eher Projekt-System / Testen", tag:"Lab", delta:{ advanced:+2, rolling:+2, minimal:+1 } },
+        { label:"Nein – primär Headless", tag:"Headless", delta:{ server:+3, minimal:+2, desktop:-2 } }
+      ]
+    },
+    {
+      id:"hardware",
+      title:"Wie alt/leistungsfähig ist deine Hardware?",
+      hint:"Ältere Geräte profitieren von schlanken Distros & leichtgewichtigen Desktops.",
+      options:[
+        { label:"Sehr alt / schwach (< 4 GB RAM)", tag:"Very old", delta:{ lightweight:+4, minimal:+2, stable:+1 } },
+        { label:"Mittel (4–8 GB RAM)", tag:"Mid", delta:{ desktop:+2, stable:+1 } },
+        { label:"Modern (16+ GB RAM)", tag:"Modern", delta:{ rolling:+1, desktop:+2, gaming:+1 } },
+        { label:"Embedded (Router/NAS/IoT)", tag:"Embedded", delta:{ minimal:+3, server:+3, lightweight:+2 } }
+      ]
+    },
+    {
+      id:"laptop",
+      title:"Laptop oder Desktop?",
+      hint:"Auf Laptops zählt oft Akku/Standby-Stabilität.",
+      options:[
+        { label:"Laptop – Akku/Standby wichtig", tag:"Laptop", delta:{ stable:+2, lightweight:+1, desktop:+1 } },
+        { label:"Desktop-PC", tag:"Desktop", delta:{ desktop:+2, gaming:+1 } },
+        { label:"Beides", tag:"Both", delta:{ desktop:+2, stable:+1 } },
+        { label:"Server/VM-Host", tag:"Host", delta:{ server:+3, stable:+2 } }
+      ]
+    },
+    {
+      id:"updates",
+      title:"Wie möchtest du Updates?",
+      hint:"Stable/LTS ist ruhiger, Rolling liefert neue Versionen schneller.",
+      options:[
+        { label:"So stabil wie möglich (LTS)", tag:"Stable", delta:{ stable:+4, rolling:-2 } },
+        { label:"Mix: stabil, aber nicht super-alt", tag:"Stable+", delta:{ stable:+2 } },
+        { label:"Neueste Software (Rolling)", tag:"Rolling", delta:{ rolling:+4, stable:-1 } },
+        { label:"Mir egal – Hauptsache sicher", tag:"Security", delta:{ security:+2, stable:+1 } }
+      ]
+    },
+    {
+      id:"risk",
+      title:"Wie riskant darf ein Update sein?",
+      hint:"Rolling kann top sein – aber je nach Setup auch „spannender“.",
+      options:[
+        { label:"Bitte langweilig: möglichst wenig Brüche", tag:"Low risk", delta:{ stable:+3 } },
+        { label:"Okay: gelegentliches Fixen ist in Ordnung", tag:"Medium", delta:{ customizable:+2, advanced:+1 } },
+        { label:"Ich will cutting edge, ich fixe zur Not", tag:"High", delta:{ rolling:+3, advanced:+2 } },
+        { label:"Ich will robust: atomic/rollback wäre ideal", tag:"Atomic", delta:{ immutable:+4, stable:+1 } }
+      ]
+    },
+    {
+      id:"gui",
+      title:"Wie wichtig ist dir eine hübsche GUI & guter Default-Desktop?",
+      hint:"Manche Distros sind UX-first, andere minimalistisch.",
+      options:[
+        { label:"Sehr wichtig – soll sofort gut aussehen", tag:"UX", delta:{ desktop:+3, beginner:+1 } },
+        { label:"Wichtig, ich passe gern an", tag:"Tweak", delta:{ desktop:+2, customizable:+2 } },
+        { label:"Nicht so wichtig – schlank/effizient", tag:"Light", delta:{ lightweight:+2, minimal:+2 } },
+        { label:"GUI egal – CLI/Server first", tag:"CLI", delta:{ server:+3, minimal:+2, desktop:-2 } }
+      ]
+    },
+    {
+      id:"desktopStyle",
+      title:"Was passt besser zu deinem Desktop-Stil?",
+      hint:"Nur eine Tendenz: am Ende ist vieles frei konfigurierbar.",
+      options:[
+        { label:"Klassisch wie Windows (Startmenü, Taskleiste)", tag:"Classic", delta:{ beginner:+2, desktop:+2 } },
+        { label:"Modern minimal (GNOME-Style)", tag:"Modern", delta:{ desktop:+2, stable:+1 } },
+        { label:"Tiling / Keyboard-first", tag:"Tiling", delta:{ advanced:+2, customizable:+3, minimal:+1 } },
+        { label:"Egal – Hauptsache performant", tag:"Perf", delta:{ lightweight:+2, rolling:+1 } }
+      ]
+    },
+    {
+      id:"drivers",
+      title:"Wie wichtig ist dir „Treiber/Hardware out of the box“?",
+      hint:"Gerade bei Wi-Fi/Nvidia kann das relevant sein.",
+      options:[
+        { label:"Sehr wichtig – ich will nicht debuggen", tag:"OOTB", delta:{ beginner:+3, stable:+1 } },
+        { label:"Wichtig, aber ich kann nachinstallieren", tag:"OK", delta:{ beginner:+1, customizable:+1 } },
+        { label:"Egal – ich löse das notfalls selbst", tag:"DIY", delta:{ advanced:+2, customizable:+2 } },
+        { label:"Server/VM – Hardware ist standardisiert", tag:"Server", delta:{ server:+2, minimal:+1 } }
+      ]
+    },
+    {
+      id:"gaming",
+      title:"Spielst du (auch) auf diesem System?",
+      hint:"Gaming-freundliche Distros optimieren Treiber/Proton/Steam.",
+      options:[
+        { label:"Ja, viel – Gaming ist Hauptfokus", tag:"Gaming", delta:{ gaming:+5, desktop:+2, rolling:+1 } },
+        { label:"Ab und zu – sollte gut gehen", tag:"Sometimes", delta:{ gaming:+3, desktop:+1 } },
+        { label:"Selten – nicht wichtig", tag:"Nope", delta:{ gaming:+0 } },
+        { label:"Nur Headless/Server – kein Gaming", tag:"Server", delta:{ server:+2, gaming:-2 } }
+      ]
+    },
+    {
+      id:"steam",
+      title:"Steam/Proton: wie wichtig ist dir „einfach starten und los“?",
+      hint:"Manche Distros (z.B. gaming/atomic) sind hier besonders bequem.",
+      options:[
+        { label:"Sehr wichtig – Console-like Experience", tag:"Console", delta:{ gaming:+4, beginner:+2, immutable:+2, desktop:+1 } },
+        { label:"Wichtig – aber ich kann ein bisschen tunen", tag:"Tune", delta:{ gaming:+3, customizable:+2 } },
+        { label:"Nicht relevant", tag:"N/A", delta:{ } },
+        { label:"Ich will eher stabile Workflows als Gaming", tag:"Work", delta:{ stable:+2, desktop:+1 } }
+      ]
+    },
+    {
+      id:"privacy",
+      title:"Wie wichtig sind dir Privacy/Anonymität?",
+      hint:"Von „normal“ bis spezialisierten Live-Systemen ist alles dabei.",
+      options:[
+        { label:"Normal – Standard reicht", tag:"Standard", delta:{ } },
+        { label:"Wichtig – wenig Telemetrie, gute Defaults", tag:"Privacy+", delta:{ privacy:+3, security:+1, stable:+1 } },
+        { label:"Sehr wichtig – harte Tools, evtl. Live-OS", tag:"High", delta:{ privacy:+5, security:+2, advanced:+1 } },
+        { label:"Extrem – maximal isoliert/sandboxed", tag:"Extreme", delta:{ privacy:+5, security:+4, advanced:+2, immutable:+1 } }
+      ]
+    },
+    {
+      id:"securityPosture",
+      title:"Wie sicherheitsorientiert soll das System sein?",
+      hint:"Security-Fokus kann Usability/Komfort etwas reduzieren.",
+      options:[
+        { label:"Standard reicht", tag:"Default", delta:{ } },
+        { label:"Hoch: Hardening & sichere Defaults", tag:"Hardened", delta:{ security:+3, stable:+1 } },
+        { label:"Sehr hoch: Isolation/VM-Modelle okay", tag:"Isolation", delta:{ security:+5, privacy:+3, advanced:+2 } },
+        { label:"Pentesting/Tooling wichtig", tag:"Tools", delta:{ security:+4, advanced:+2 } }
+      ]
+    },
+    {
+      id:"immutable",
+      title:"Wie stehst du zu Immutable/Atomic Desktops?",
+      hint:"Robust, rollback-freundlich – dafür weniger „am System rumschrauben“.",
+      options:[
+        { label:"Klingt super – robust & rollback", tag:"Yes", delta:{ immutable:+4, stable:+1 } },
+        { label:"Neutral – egal", tag:"Meh", delta:{ } },
+        { label:"Nein – ich will klassisch alles ändern", tag:"Classic", delta:{ customizable:+2, immutable:-2 } },
+        { label:"Ich will es für Gaming/SteamOS-Feeling", tag:"Gaming Atomic", delta:{ immutable:+3, gaming:+3, desktop:+1 } }
+      ]
+    },
+    {
+      id:"customize",
+      title:"Wie viel willst du selbst konfigurieren?",
+      hint:"Das trennt „Batteries included“ von Arch/Gentoo/Nix usw.",
+      options:[
+        { label:"Wenig – Installer, Treiber, fertig", tag:"Low", delta:{ beginner:+3, stable:+1 } },
+        { label:"Ein bisschen – Themes, Pakete, Tweaks", tag:"Medium", delta:{ customizable:+2, desktop:+1 } },
+        { label:"Viel – ich setze gern alles selbst auf", tag:"High", delta:{ advanced:+3, customizable:+3, minimal:+1 } },
+        { label:"Deklarativ/repoduzierbar (Nix etc.)", tag:"Declarative", delta:{ advanced:+2, customizable:+2, immutable:+2, minimal:+1 } }
+      ]
+    },
+    {
+      id:"minimalism",
+      title:"Magst du eher Minimalismus oder Full-Featured?",
+      hint:"„Minimal“ spart Ressourcen, „Full“ spart Zeit beim Setup.",
+      options:[
+        { label:"Full-Featured – alles drin", tag:"Full", delta:{ beginner:+2, desktop:+2 } },
+        { label:"Balanced", tag:"Balanced", delta:{ desktop:+1, stable:+1 } },
+        { label:"Minimal – ich installiere nur was ich brauche", tag:"Minimal", delta:{ minimal:+4, lightweight:+1, advanced:+1 } },
+        { label:"Ultra-minimal / Lernprojekt", tag:"Ultra", delta:{ minimal:+5, advanced:+2, lightweight:+2 } }
+      ]
+    },
+    {
+      id:"package",
+      title:"Was ist dir bei Paketen wichtiger?",
+      hint:"Repos, Stabilität, Frische – und wie gern du debugst.",
+      options:[
+        { label:"Stabilität & geprüfte Pakete", tag:"Curated", delta:{ stable:+3 } },
+        { label:"Sehr viele Pakete & gute Doku", tag:"Docs", delta:{ advanced:+1, customizable:+1 } },
+        { label:"Neue Versionen schnell verfügbar", tag:"Fresh", delta:{ rolling:+3, desktop:+1 } },
+        { label:"Minimal – kleiner Footprint", tag:"Small", delta:{ minimal:+3, lightweight:+1 } }
+      ]
+    },
+    {
+      id:"support",
+      title:"Brauchst du Enterprise-Support oder reicht Community?",
+      hint:"Für Firmenumgebungen sind RHEL-Derivate/LTS oft Standard.",
+      options:[
+        { label:"Community reicht", tag:"Community", delta:{ } },
+        { label:"Nice-to-have: solide, aber ohne Verträge", tag:"Pro", delta:{ stable:+1, enterprise:+1 } },
+        { label:"Ja – Enterprise/Kompatibilität ist wichtig", tag:"Enterprise", delta:{ enterprise:+5, stable:+2, server:+2 } },
+        { label:"Home-Lab – wie Enterprise lernen", tag:"Lab", delta:{ enterprise:+3, server:+3, advanced:+1 } }
+      ]
+    },
+    {
+      id:"serverRole",
+      title:"Wenn Server: was ist dein Fokus?",
+      hint:"Host, NAS, Container – unterschiedliche sweet spots.",
+      options:[
+        { label:"Kein Server", tag:"No", delta:{ } },
+        { label:"Container/Services (Docker/Podman)", tag:"Containers", delta:{ server:+3, minimal:+1, security:+1 } },
+        { label:"Virtualisierung (VMs, Cluster)", tag:"Virt", delta:{ server:+4, enterprise:+2, stable:+1 } },
+        { label:"NAS/Storage", tag:"NAS", delta:{ server:+4, stable:+2, enterprise:+1 } }
+      ]
+    },
+    {
+      id:"learning",
+      title:"Willst du Linux „richtig lernen“ (Systemverständnis)?",
+      hint:"DIY-Distros erzwingen Verständnis, komfortable Distros sparen Zeit.",
+      options:[
+        { label:"Ja, ich will lernen durch Setup", tag:"Learn", delta:{ advanced:+2, customizable:+2, minimal:+1 } },
+        { label:"Ein bisschen, aber nicht zu viel Leid", tag:"Some", delta:{ customizable:+1, advanced:+1 } },
+        { label:"Nein – Produktivität > Lernen", tag:"Prod", delta:{ beginner:+2, desktop:+2, stable:+1 } },
+        { label:"Nur Security-Lernen", tag:"Sec", delta:{ security:+3, privacy:+2, advanced:+1 } }
+      ]
+    },
+    {
+      id:"stabilityVsSpeed",
+      title:"Was nervt dich mehr?",
+      hint:"Jede Antwort ist ein klares Signal für stable vs rolling.",
+      options:[
+        { label:"Alte Pakete", tag:"Hate old", delta:{ rolling:+3 } },
+        { label:"Kaputte Updates", tag:"Hate breaks", delta:{ stable:+3 } },
+        { label:"Zu viel Klick-UI / Bloat", tag:"Hate bloat", delta:{ minimal:+2, lightweight:+2 } },
+        { label:"Zu viel Handarbeit", tag:"Hate DIY", delta:{ beginner:+3 } }
+      ]
+    },
+    {
+      id:"workflow",
+      title:"Was beschreibt deinen Workflow am besten?",
+      hint:"„Ich will arbeiten“ vs „ich will optimieren“.",
+      options:[
+        { label:"Arbeiten/Produktion – wenig Wartung", tag:"Work", delta:{ stable:+2, beginner:+1, desktop:+2 } },
+        { label:"Optimieren/Tunen – ich tweak gern", tag:"Tune", delta:{ customizable:+3, advanced:+1 } },
+        { label:"Experimentieren – neue Sachen testen", tag:"Experiment", delta:{ rolling:+3, advanced:+1 } },
+        { label:"Isolieren/Absichern – Sicherheit first", tag:"Secure", delta:{ security:+3, privacy:+2 } }
+      ]
+    },
+    {
+      id:"formfactor",
+      title:"Welche System-Form passt besser zu dir?",
+      hint:"Immutable/Atomic ist robust, klassisch ist flexibel.",
+      options:[
+        { label:"Klassisch – normales System, ich ändere alles", tag:"Classic", delta:{ customizable:+2, immutable:-1 } },
+        { label:"Robust – Atomic/Immutable, Rollback", tag:"Immutable", delta:{ immutable:+4, stable:+1 } },
+        { label:"Live-System (USB, portabel)", tag:"Live", delta:{ privacy:+2, security:+2, minimal:+1 } },
+        { label:"Appliance (NAS/Router/Services)", tag:"Appliance", delta:{ server:+3, minimal:+2, stable:+1 } }
+      ]
+    }
+  ];
+
+  // ---------- 50 Distros (inkl. Bazzite) ----------
+  // ChromeOS Flex wurde entfernt, damit es bei 50 bleibt.
+  const DISTROS = [
+    { name:"Ubuntu", link:"https://ubuntu.com/", desc:"Sehr verbreitet, gute Hardware-Unterstützung, große Community.", tags:["desktop","stable","beginner"], prof:{ beginner:5, desktop:4, stable:4, server:3 } },
+    { name:"Linux Mint", link:"https://linuxmint.com/", desc:"Sehr einsteigerfreundlich, klassischer Desktop-Workflow.", tags:["desktop","stable","beginner"], prof:{ beginner:5, desktop:5, stable:4 } },
+    { name:"Fedora Workstation", link:"https://fedoraproject.org/workstation/", desc:"Modern, sauber, oft nah an Upstream (GNOME).", tags:["desktop","fresh"], prof:{ desktop:4, stable:2, rolling:2, advanced:2, security:2 } },
+    { name:"Debian", link:"https://www.debian.org/", desc:"Extrem solide Basis, konservative Pakete, ideal für Server.", tags:["stable","server"], prof:{ stable:5, server:4, minimal:2, advanced:2 } },
+    { name:"Arch Linux", link:"https://archlinux.org/", desc:"DIY, Rolling, riesige Doku (Arch Wiki).", tags:["rolling","advanced"], prof:{ advanced:5, rolling:5, minimal:3, customizable:5 } },
+    { name:"Manjaro", link:"https://manjaro.org/", desc:"Arch-basiert, aber komfortabler Einstieg, Rolling.", tags:["rolling","desktop"], prof:{ rolling:4, desktop:4, beginner:3, customizable:3, gaming:3 } },
+    { name:"Pop!_OS", link:"https://pop.system76.com/", desc:"Gaming/Creator-freundlich, gute Nvidia-Optionen.", tags:["gaming","desktop"], prof:{ desktop:5, gaming:4, beginner:4, stable:3 } },
+    { name:"openSUSE Leap", link:"https://www.opensuse.org/", desc:"Stabil, YaST-Tools, gut für Workstations & Server.", tags:["stable","enterprise"], prof:{ stable:4, enterprise:3, server:3, desktop:3, advanced:2 } },
+    { name:"openSUSE Tumbleweed", link:"https://www.opensuse.org/", desc:"Rolling mit starken QA-Prozessen.", tags:["rolling"], prof:{ rolling:4, advanced:3, desktop:3, security:2 } },
+    { name:"EndeavourOS", link:"https://endeavouros.com/", desc:"Arch-nah, aber mit Installer & netter Community.", tags:["rolling","arch"], prof:{ rolling:5, advanced:4, customizable:4, desktop:3 } },
+    { name:"elementary OS", link:"https://elementary.io/", desc:"Design-fokussiert, macOS-ähnliche UX.", tags:["desktop","ux"], prof:{ desktop:5, beginner:4, stable:3 } },
+    { name:"Zorin OS", link:"https://zorin.com/os/", desc:"Windows-Umsteigerfreundlich, polished Desktop.", tags:["desktop","beginner"], prof:{ desktop:5, beginner:5, stable:3 } },
+    { name:"KDE neon", link:"https://neon.kde.org/", desc:"Neueste KDE Plasma auf Ubuntu-Basis.", tags:["desktop","fresh"], prof:{ desktop:5, rolling:2, stable:2, customizable:4 } },
+    { name:"MX Linux", link:"https://mxlinux.org/", desc:"Leichtgewichtig, stabil, viele Tools.", tags:["lightweight","stable"], prof:{ lightweight:4, stable:4, desktop:4, beginner:4 } },
+    { name:"Xubuntu", link:"https://xubuntu.org/", desc:"Ubuntu + XFCE: leicht und zuverlässig.", tags:["lightweight","desktop"], prof:{ lightweight:4, desktop:4, beginner:4, stable:3 } },
+    { name:"Lubuntu", link:"https://lubuntu.me/", desc:"Sehr leicht (LXQt), gut für alte Geräte.", tags:["lightweight"], prof:{ lightweight:5, desktop:3, beginner:4, stable:3 } },
+    { name:"Kubuntu", link:"https://kubuntu.org/", desc:"Ubuntu mit KDE Plasma.", tags:["desktop"], prof:{ desktop:5, beginner:4, stable:3, customizable:3 } },
+    { name:"Ubuntu Studio", link:"https://ubuntustudio.org/", desc:"Multimedia/Creator-Stack (Audio/Video/Graphics).", tags:["desktop","creator"], prof:{ desktop:4, beginner:4, stable:3 } },
+
+    { name:"RHEL (Red Hat Enterprise Linux)", link:"https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux", desc:"Enterprise-Standard, Support & Zertifizierungen.", tags:["enterprise","server"], prof:{ enterprise:6, stable:5, server:5, security:3 } },
+    { name:"CentOS Stream", link:"https://www.centos.org/centos-stream/", desc:"Midstream zwischen Fedora und RHEL, Server-nah.", tags:["server","enterprise"], prof:{ server:4, enterprise:4, stable:3, advanced:2 } },
+    { name:"Rocky Linux", link:"https://rockylinux.org/", desc:"RHEL-kompatibel, Community-getrieben.", tags:["enterprise","server"], prof:{ enterprise:5, stable:5, server:5 } },
+    { name:"AlmaLinux", link:"https://almalinux.org/", desc:"RHEL-kompatibel, stabil für Server.", tags:["enterprise","server"], prof:{ enterprise:5, stable:5, server:5 } },
+    { name:"Oracle Linux", link:"https://www.oracle.com/linux/", desc:"RHEL-kompatibel, Enterprise-orientiert.", tags:["enterprise","server"], prof:{ enterprise:5, stable:5, server:5 } },
+
+    { name:"Alpine Linux", link:"https://alpinelinux.org/", desc:"Sehr klein, musl+busybox, stark für Container.", tags:["minimal","server"], prof:{ minimal:5, lightweight:5, server:4, security:3, advanced:3 } },
+    { name:"Void Linux", link:"https://voidlinux.org/", desc:"Unabhängig, runit-init, rolling-ish, minimal.", tags:["minimal","advanced"], prof:{ advanced:4, minimal:4, rolling:3, lightweight:3, customizable:3 } },
+    { name:"Gentoo", link:"https://www.gentoo.org/", desc:"Source-based, maximale Kontrolle/Optimierung.", tags:["advanced","custom"], prof:{ advanced:6, customizable:6, minimal:3, rolling:3 } },
+    { name:"Slackware", link:"http://www.slackware.com/", desc:"Klassisch, minimal, konservativ – für Puristen.", tags:["minimal","stable"], prof:{ advanced:4, minimal:4, stable:4, customizable:3 } },
+    { name:"NixOS", link:"https://nixos.org/", desc:"Deklaratives System, reproduzierbar, mächtig.", tags:["declarative","advanced"], prof:{ advanced:5, customizable:5, immutable:2, minimal:2, server:3, desktop:3 } },
+
+    { name:"Solus", link:"https://getsol.us/", desc:"Desktop-first, curated Rolling, Budgie.", tags:["desktop"], prof:{ desktop:5, beginner:3, rolling:3 } },
+    { name:"Deepin", link:"https://www.deepin.org/", desc:"Sehr schicker Desktop (DDE), UX-fokussiert.", tags:["desktop","ux"], prof:{ desktop:5, beginner:4, stable:3 } },
+
+    { name:"Garuda Linux", link:"https://garudalinux.org/", desc:"Arch-basiert, performance/gaming-tuned.", tags:["gaming","rolling"], prof:{ gaming:5, rolling:5, advanced:3, desktop:4 } },
+    { name:"CachyOS", link:"https://cachyos.org/", desc:"Arch-basiert, performance-orientiert.", tags:["rolling","performance"], prof:{ rolling:5, advanced:3, desktop:3, gaming:4 } },
+    { name:"Clear Linux", link:"https://clearlinux.org/", desc:"Performance-fokussiert, modern, stark für Dev/Cloud.", tags:["dev","performance"], prof:{ rolling:3, server:3, advanced:2, minimal:2 } },
+
+    { name:"Kali Linux", link:"https://www.kali.org/", desc:"Pentesting-Toolset, nicht primär als Daily Driver.", tags:["security"], prof:{ security:6, privacy:2, advanced:4, desktop:2 } },
+    { name:"Parrot OS", link:"https://www.parrotsec.org/", desc:"Security/Privacy-orientiert, auch als Daily nutzbar.", tags:["security","privacy"], prof:{ security:5, privacy:4, advanced:3, desktop:3 } },
+    { name:"Tails", link:"https://tails.net/", desc:"Live-OS für Anonymität (Tor), Privacy-first.", tags:["privacy","live"], prof:{ privacy:6, security:4, minimal:3, desktop:2, immutable:2 } },
+    { name:"Qubes OS", link:"https://www.qubes-os.org/", desc:"Security durch Isolation (VMs), anspruchsvoll.", tags:["security","isolation"], prof:{ security:6, privacy:5, advanced:5, immutable:2 } },
+    { name:"Whonix", link:"https://www.whonix.org/", desc:"Tor-basierte Isolation (Gateway/Workstation).", tags:["privacy","security"], prof:{ privacy:6, security:5, advanced:4, desktop:2 } },
+
+    { name:"Ubuntu Core", link:"https://ubuntu.com/core", desc:"Snap-basiert, IoT/Embedded, eher appliance.", tags:["immutable","embedded"], prof:{ immutable:5, minimal:3, server:3, stable:4, lightweight:2 } },
+    { name:"Fedora Silverblue", link:"https://fedoraproject.org/silverblue/", desc:"Immutable Desktop (rpm-ostree), robust & modern.", tags:["immutable","desktop"], prof:{ immutable:6, desktop:4, security:3, rolling:2, advanced:2 } },
+    { name:"Fedora Kinoite", link:"https://fedoraproject.org/kinoite/", desc:"Silverblue-Variante mit KDE Plasma (immutable).", tags:["immutable","desktop"], prof:{ immutable:6, desktop:4, security:3, rolling:2, customizable:3 } },
+    { name:"Bazzite", link:"https://bazzite.gg/", desc:"Gaming-fokussiertes Fedora-Atomic (SteamOS-Feeling, sehr bequem).", tags:["gaming","immutable","desktop"], prof:{ immutable:6, gaming:5, desktop:4, beginner:3, security:2, rolling:2 } },
+    { name:"Endless OS", link:"https://endlessos.com/", desc:"Sehr einsteigerfreundlich, offline-freundlich, immutable-ish.", tags:["beginner"], prof:{ beginner:5, desktop:4, immutable:3, stable:3 } },
+
+    { name:"Puppy Linux", link:"https://puppylinux-woof-ce.github.io/", desc:"Extrem leicht, läuft gut auf sehr alter Hardware.", tags:["lightweight"], prof:{ lightweight:6, minimal:4, desktop:2 } },
+    { name:"Tiny Core Linux", link:"http://www.tinycorelinux.net/", desc:"Ultra-minimal, ideal zum Lernen/Embedded.", tags:["minimal","lightweight"], prof:{ lightweight:6, minimal:6, advanced:3 } },
+    { name:"antiX", link:"https://antixlinux.com/", desc:"Sehr leicht, Debian-basiert, gut für alte Rechner.", tags:["lightweight","stable"], prof:{ lightweight:5, stable:4, desktop:3 } },
+    { name:"Bodhi Linux", link:"https://www.bodhilinux.com/", desc:"Leicht, Moksha-Desktop, Ubuntu-Basis.", tags:["lightweight","desktop"], prof:{ lightweight:4, desktop:3, beginner:3, stable:3 } },
+    { name:"Peppermint OS", link:"https://peppermintos.com/", desc:"Leicht, pragmatisch, gut für ältere Hardware.", tags:["lightweight"], prof:{ lightweight:4, desktop:3, beginner:4, stable:3 } },
+
+    { name:"Raspberry Pi OS", link:"https://www.raspberrypi.com/software/", desc:"Standard für Raspberry Pi, gut dokumentiert.", tags:["embedded","beginner"], prof:{ beginner:4, lightweight:4, desktop:3, server:2, stable:3 } },
+    { name:"OpenWrt", link:"https://openwrt.org/", desc:"Router/Network-Appliance Linux, paketierbar.", tags:["embedded","network"], prof:{ minimal:5, server:4, lightweight:5, advanced:3, stable:3 } },
+    { name:"TrueNAS SCALE", link:"https://www.truenas.com/truenas-scale/", desc:"NAS/Storage-Appliance auf Linux-Basis (ZFS).", tags:["server","appliance"], prof:{ server:5, stable:4, minimal:2, enterprise:2 } },
+    { name:"Proxmox VE", link:"https://www.proxmox.com/en/proxmox-ve", desc:"Virtualisierung/Container-Host (Debian-basiert).", tags:["server","virtualization"], prof:{ server:6, stable:4, enterprise:3, advanced:2 } }
+  ];
+
+  // Soft-assert: 50 Distros
+  if (DISTROS.length !== 50) console.warn("DISTROS ist nicht 50! Aktuell:", DISTROS.length);
+
+  // ---------- Scoring ----------
+  function dot(user, prof){
+    let s = 0;
+    for (const t of TRAITS){
+      const u = user[t] || 0;
+      const p = prof[t] || 0;
+      s += u * p;
+    }
+    return s;
+  }
+  function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+  // ---------- State ----------
+  let idx = 0;
+  const answers = new Array(QUESTIONS.length).fill(null);
+  const userTraits = Object.fromEntries(TRAITS.map(t => [t, 0]));
+  let lastComputed = null;
+
+  // ---------- DOM ----------
+  const qTitle = document.getElementById("qTitle");
+  const qHint = document.getElementById("qHint");
+  const choices = document.getElementById("choices");
+  const btnBack = document.getElementById("btnBack");
+  const btnNext = document.getElementById("btnNext");
+  const btnRestart = document.getElementById("btnRestart");
+  const btnRestart2 = document.getElementById("btnRestart2");
+  const btnResetTop = document.getElementById("btnResetTop");
+  const progressFill = document.getElementById("progressFill");
+  const progressText = document.getElementById("progressText");
+  const traitChips = document.getElementById("traitChips");
+
+  const quizView = document.getElementById("quizView");
+  const resultsView = document.getElementById("resultsView");
+  const resultList = document.getElementById("resultList");
+  const resultSummary = document.getElementById("resultSummary");
+  const btnSkipToResults = document.getElementById("btnSkipToResults");
+  const btnBackToQuiz = document.getElementById("btnBackToQuiz");
+  const btnCopyTop = document.getElementById("btnCopyTop");
+  const search = document.getElementById("search");
+
+  const toast = document.getElementById("toast");
+  const toastTitle = document.getElementById("toastTitle");
+  const toastBody = document.getElementById("toastBody");
+  let toastTimer = null;
+
+  function showToast(title, body=""){
+    toastTitle.textContent = title;
+    toastBody.textContent = body;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  // ---------- Trait handling ----------
+  function recomputeUserTraits(){
+    for (const t of TRAITS) userTraits[t] = 0;
+    for (let i=0;i<answers.length;i++){
+      const a = answers[i];
+      if (a === null) continue;
+      const delta = QUESTIONS[i].options[a].delta || {};
+      for (const [k,v] of Object.entries(delta)){
+        userTraits[k] = (userTraits[k] || 0) + v;
+      }
+    }
+  }
+
+  function topTraits(n=10){
+    const arr = TRAITS
+      .map(t => ({ t, v: userTraits[t] || 0 }))
+      .filter(x => x.v !== 0)
+      .sort((a,b) => Math.abs(b.v) - Math.abs(a.v));
+    return arr.slice(0,n);
+  }
+
+  function renderTraitChips(){
+    recomputeUserTraits();
+    const top = topTraits(10);
+    traitChips.innerHTML = "";
+    if (top.length === 0){
+      const el = document.createElement("div");
+      el.className = "chip";
+      el.innerHTML = `<strong>Noch leer</strong> <span class="muted">– beantworte die erste Frage</span>`;
+      traitChips.appendChild(el);
+      return;
+    }
+    for (const {t,v} of top){
+      const el = document.createElement("div");
+      const cls = v >= 3 ? "chip good" : (v <= -2 ? "chip warn" : "chip");
+      el.className = cls;
+      const sign = v > 0 ? "+" : "";
+      el.innerHTML = `<strong>${traitLabel[t]}</strong> <span class="muted">(${sign}${v})</span>`;
+      traitChips.appendChild(el);
+    }
+  }
+
+  // ---------- Quiz ----------
+  function updateProgress(){
+    const answered = answers.filter(x => x !== null).length;
+    const total = QUESTIONS.length;
+    progressFill.style.width = `${(answered/total)*100}%`;
+    progressText.textContent = `${answered} / ${total}`;
+  }
+
+  function renderQuestion(){
+    const q = QUESTIONS[idx];
+    qTitle.textContent = q.title;
+    qHint.textContent = q.hint;
+
+    choices.innerHTML = "";
+    q.options.forEach((opt,i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn fadeIn";
+      const picked = answers[idx] === i;
+      if (picked){
+        b.style.borderColor = "rgba(124,92,255,.55)";
+        b.style.background = "rgba(124,92,255,.12)";
+      }
+      const deltaPreview = Object.entries(opt.delta || {})
+        .slice(0,3)
+        .map(([k,v]) => `${traitLabel[k]} ${v>0?"+":""}${v}`)
+        .join(" · ");
+      b.innerHTML = `
+        <div class="t">
+          <div><span class="kbd">${i+1}</span> ${opt.label}</div>
+          <div class="tag">${opt.tag}</div>
+        </div>
+        <div class="sub">${deltaPreview || "&nbsp;"}</div>
+      `;
+      b.addEventListener("click", () => pickAnswer(i));
+      choices.appendChild(b);
+    });
+
+    btnBack.disabled = idx === 0;
+    btnNext.textContent = idx === QUESTIONS.length - 1 ? "Ergebnis" : "Weiter";
+
+    updateProgress();
+    renderTraitChips();
+  }
+
+  function pickAnswer(optionIndex){
+    answers[idx] = optionIndex;
+    renderQuestion();
+    setTimeout(() => {
+      if (idx < QUESTIONS.length - 1) { idx++; renderQuestion(); }
+      else showResults();
+    }, 120);
+  }
+
+  function next(){
+    if (idx === QUESTIONS.length - 1) { showResults(); return; }
+    idx++; renderQuestion();
+  }
+  function back(){ if (idx > 0) idx--; renderQuestion(); }
+
+  function resetAll(){
+    idx = 0;
+    for (let i=0;i<answers.length;i++) answers[i] = null;
+    lastComputed = null;
+    quizView.style.display = "";
+    resultsView.style.display = "none";
+    renderQuestion();
+    showToast("Reset", "Quiz wurde neu gestartet.");
+  }
+
+  // ---------- Results ----------
+  function computeResults(){
+    recomputeUserTraits();
+
+    const answeredCount = answers.filter(x => x !== null).length;
+    const completeness = answeredCount / QUESTIONS.length;
+
+    const base = { ...userTraits };
+
+    // Wenn sehr wenige Antworten: Extremwerte etwas dämpfen
+    if (completeness < 0.35){
+      for (const t of TRAITS) base[t] *= 0.75;
+    }
+
+    const scored = DISTROS.map(d => ({ ...d, score: dot(base, d.prof || {}) }))
+      .sort((a,b) => b.score - a.score);
+
+    const topScore = scored[0]?.score ?? 1;
+    const minScore = scored[scored.length-1]?.score ?? 0;
+    const span = Math.max(1, topScore - minScore);
+
+    const normed = scored.map(s => ({
+      ...s,
+      pct: clamp(((s.score - minScore) / span) * 100, 0, 100)
+    }));
+
+    return { normed, completeness, answeredCount };
+  }
+
+  function summarizeProfile(){
+    const top = topTraits(6);
+    if (top.length === 0) return "Noch keine Antworten – neutrale Empfehlungen.";
+    const parts = top.slice(0,4).map(({t,v}) => `${traitLabel[t]} (${v>0?"+":""}${v})`);
+    return `Dein Profil betont: ${parts.join(", ")}.`;
+  }
+
+  function matchesSearch(d, q){
+    if (!q) return true;
+    const hay = [d.name, d.desc, ...(d.tags||[]), ...Object.keys(d.prof||{})].join(" ").toLowerCase();
+    return hay.includes(q);
+  }
+
+  function renderResults(){
+    const { normed, completeness, answeredCount } = computeResults();
+    lastComputed = normed;
+
+    const top5 = normed.slice(0,5).map(x => x.name).join(", ");
+    const pctTxt = Math.round(completeness * 100);
+
+    resultSummary.textContent =
+      `${summarizeProfile()} Beantwortet: ${answeredCount}/${QUESTIONS.length} (${pctTxt}%). Top-5: ${top5}.`;
+
+    const q = (search.value || "").trim().toLowerCase();
+    resultList.innerHTML = "";
+
+    const list = normed.filter(d => matchesSearch(d, q)).slice(0, 30);
+    list.forEach((d,i) => {
+      const el = document.createElement("div");
+      el.className = "resultCard fadeIn";
+
+      const tags = (d.tags||[]).slice(0,4).map(t => `<span class="chip" style="padding:5px 9px">${t}</span>`).join("");
+
+      el.innerHTML = `
+        <div class="resultTop">
+          <div>
+            <p class="resultName">${i+1}. ${d.name}</p>
+            <p class="resultDesc">${d.desc}</p>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px">${tags}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="scorePill" title="Relativer Score">Match: ${Math.round(d.pct)}%</div>
+            <div style="margin-top:8px">
+              <a class="mini" href="${d.link}" target="_blank" rel="noopener noreferrer" style="display:inline-block; text-decoration:none">
+                Website ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="meter" aria-label="Match-Meter"><div style="width:${d.pct.toFixed(1)}%"></div></div>
+      `;
+      resultList.appendChild(el);
+    });
+
+    if (list.length === 0){
+      const el = document.createElement("div");
+      el.className = "resultCard";
+      el.innerHTML = `<p class="resultName">Keine Treffer</p><p class="resultDesc">Der Filter passt auf keine Distro. Versuch ein anderes Stichwort.</p>`;
+      resultList.appendChild(el);
+    }
+
+    const top1 = normed[0];
+    if (top1) showToast("Top-Match", `${top1.name} (${Math.round(top1.pct)}% Match)`);
+  }
+
+  function showResults(){
+    quizView.style.display = "none";
+    resultsView.style.display = "";
+    renderTraitChips();
+    renderResults();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function backToQuiz(){
+    resultsView.style.display = "none";
+    quizView.style.display = "";
+    renderQuestion();
+  }
+
+  async function copyTop5(){
+    const list = lastComputed || computeResults().normed;
+    const top = list.slice(0,5);
+    const lines = top.map((d,i) => `${i+1}. ${d.name} – ${Math.round(d.pct)}% – ${d.link}`);
+    const text = "Meine Linux Distro Empfehlungen (Top 5):\n" + lines.join("\n");
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast("Kopiert", "Top 5 in die Zwischenablage kopiert.");
+    }catch(e){
+      showToast("Konnte nicht kopieren", "Browser blockiert Clipboard. Text wird angezeigt.");
+      alert(text);
+    }
+  }
+
+  // ---------- Events ----------
+  btnBack.addEventListener("click", back);
+  btnNext.addEventListener("click", () => {
+    if (answers[idx] === null){
+      showToast("Fehlt noch", "Bitte wähle eine Antwort, dann weiter.");
+      return;
+    }
+    next();
+  });
+  btnRestart.addEventListener("click", resetAll);
+  btnRestart2.addEventListener("click", resetAll);
+  btnResetTop.addEventListener("click", resetAll);
+
+  btnSkipToResults.addEventListener("click", showResults);
+  btnBackToQuiz.addEventListener("click", backToQuiz);
+
+  btnCopyTop.addEventListener("click", copyTop5);
+  search.addEventListener("input", renderResults);
+
+  document.addEventListener("keydown", (e) => {
+    const active = document.activeElement;
+    const isTyping = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+    if (isTyping) return;
+
+    if (e.key === "ArrowRight"){ e.preventDefault(); btnNext.click(); }
+    if (e.key === "ArrowLeft"){ e.preventDefault(); btnBack.click(); }
+
+    const n = parseInt(e.key, 10);
+    if (!Number.isNaN(n) && n >= 1 && n <= 9){
+      if (quizView.style.display !== "none"){
+        const q = QUESTIONS[idx];
+        if (q && q.options[n-1]) pickAnswer(n-1);
+      }
+    }
+  });
+
+  // Initial
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
